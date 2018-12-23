@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html style="height:100%">
+<head>
+    <meta charset="UTF-8">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"> 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>    
+    <title>CS pizza</title>
+</head>
+<body style="height:100%">
+    <img id='pizza_background' src="{% static 'pizza_background.jpeg' %}">
+    {% if Category %}  <!--hide when not logged in-->
+    <div id='username'>
+        <h4 class='px-2' ><a href="{% url 'index' %}"><img src="{% static 'home.png' %}"></a> |
+            {{user.username}} | 
+            {% if user.is_superuser %}
+            <small><a href="{% url 'orders_manager' user Order_number %}">Orders manager</a></small> |
+            {% endif %}
+            {% if not user.is_superuser %}
+            <small><a href="{% url 'my_orders' Order_number %}">My orders</a></small> |
+            {% endif %}
+            <small><a href="{% url 'logout' %}"> Log out&nbsp;</a></small>
+        </h4>
+    </div>
+    {% endif %}
+    <p id='logo' class='text-center m-0 font-weight-bold'><a href="{% url 'index' %}">CS Pizza</a></p>
+    
+    <div id='my_orders_container' class='w-50 mx-auto'>
+        <div class=' text-left pr-3'>
+            <ul >
+                {% for number in All_orders%}
+                <a href="{% url 'my_orders' number.order_number %}"><li ><span>Order no: {{number.order_number}}</span><span class='float-right'>Status: <span class='text-warning'>{{number.status}}</span></span></li></a>
+                {% endfor %}
+            </ul>
+        </div>
+        <ul>
+            <hr class='bg-info'>
+            {% for check_cat in Checkout_category %}
+                <li class='text-info text-right pr-3'>{{check_cat|cut:"("|cut:")"|cut:","|cut:"'"}}</li>
+                {% for row in Checkout %}
+                {% if row.category == check_cat|cut:"("|cut:")"|cut:","|cut:"'"  %}
+                <li class='pr-3 text-right'>{{row}}&nbsp;</li>
+                {% endif %}
+                {% endfor %}
+            {% endfor %} 
+            <hr class='bg-info'>
+            <li class='text-info text-right pr-3 '><h1><small class='text-white'>Total</small> ${{Total|floatformat:2}}</h1></li>
+        </ul>
+        {% if Status == 'initiated' and Total %}
+        <a id='confirm_order'  href="{% url 'confirmed' Order_number %}"><div class='bg-info w-100 text-center text-white'><h3 class='p-3'>Confirm</h3></div></a>
+        {% endif %}
+    </div>
+</body>
+</html>
